@@ -4,7 +4,6 @@ import os
 
 import torch.optim as optim
 from torch.autograd import Variable
-import pandas as pd
 
 from evaluation import evaluate_ranking
 from interactions import Interactions
@@ -126,14 +125,14 @@ class Recommender(object):
         
         ### create results file if it does not exist
 
-        results_dir = save_dir + 'model.results'
+        results_dir = save_dir + 'results.csv'
         column_names = ['map','prec@1','prec@5','prec@10', 'recall@1', 'recall@5', 'recall@10']
         if not os.path.exists(results_dir):
             results = pd.DataFrame(columns = column_names)
-            results.to_pickle(results_dir)
+            results.to_csv(results_dir, index=False)
         
-        results = pd.DataFrame([[0,0,0,0,0,0,0]], columns=['map','prec@1','prec@5','prec@10', 'recall@1', 'recall@5', 'recall@10'])
-        results = results.append(pd.read_pickle(results_dir), ignore_index=True)
+        results = pd.DataFrame([[0,0,0,0,0,0,0],], columns=['map','prec@1','prec@5','prec@10', 'recall@1', 'recall@5', 'recall@10'])
+        results = results.append(pd.load_csv(results_dir), ignore_index=True)
 
         for epoch_num in range(start_epoch, self._n_iter):
 
@@ -214,6 +213,8 @@ class Recommender(object):
                 print(output_str)
                 if mean_aps > best_map:
                     best_map = mean_aps
+                    best_precision = precision
+                    best_recall = recall
 
                     best_results = {'map':best_map,
                                     'prec@1':np.mean(precision[0]),
