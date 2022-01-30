@@ -4,6 +4,7 @@ import os
 
 import torch.optim as optim
 from torch.autograd import Variable
+import pandas as pd
 
 from evaluation import evaluate_ranking
 from interactions import Interactions
@@ -122,6 +123,17 @@ class Recommender(object):
         save_dir = args.save_root + args.dataset + '/'
         if not os.path.exists(save_dir):
             os.makedirs(save_dir)
+        
+        ### create results file if it does not exist
+
+        results_dir = save_dir + 'model.results'
+        column_names = ['map','prec@1','prec@5','prec@10', 'recall@1', 'recall@5', 'recall@10']
+        if not os.path.exists(results_dir):
+            results = pd.DataFrame(columns = column_names)
+            results.to_pickle(results_dir)
+        
+        results = pd.DataFrame([[0,0,0,0,0,0,0]], columns=['map','prec@1','prec@5','prec@10', 'recall@1', 'recall@5', 'recall@10'])
+        results = results.append(pd.read_pickle(results_dir), ignore_index=True)
 
         for epoch_num in range(start_epoch, self._n_iter):
 
@@ -202,12 +214,26 @@ class Recommender(object):
                 print(output_str)
                 if mean_aps > best_map:
                     best_map = mean_aps
+
+                    best_results = {'map':best_map,
+                                    'prec@1':np.mean(precision[0]),
+                                    'prec@5':np.mean(precision[1]),
+                                    'prec@10':np.mean(precision[2]), 
+                                    'recall@1':np.mean(recall[0]), 
+                                    'recall@5':np.mean(recall[1]), 
+                                    'recall@10':np.mean(recall[2])}
+
+                    results.iloc[0] = best_results
+                    results.to_pickle(results_dir)
+
                     checkpoint_name = "best_model.pth.tar"
                     save_checkpoint({
                     'epoch': epoch_num+1,
                     'state_dict': self._net.state_dict(),
                     'optimizer': self._optimizer.state_dict(),
                     }, checkpoint_name, save_dir)
+
+                    
 
             else:
                 output_str = "Epoch %d [%.1f s]\tloss=%.4f [%.1f s]" % (epoch_num + 1,
@@ -306,7 +332,7 @@ if __name__ == '__main__':
 
     # data arguments
     parser.add_argument('--dataset', type=str, required=True,
-                            choices=['ml1m', 'gowalla'])
+                            choices=['ml1m', 'gowalla','ml1m-custom', 'gowalla-custom'])
     parser.add_argument('--data_root', type=str, default='data/')
     parser.add_argument('--train_dir', type=str, default='/test/train.txt')
     parser.add_argument('--test_dir', type=str, default='/test/test.txt')
