@@ -1,4 +1,6 @@
-## Reproducibility study: CosRec, 2D Convolutional Neural Networks for Sequential Recommendation
+## Reproducibility study for CosRec: 2D Convolutional Neural Networks for Sequential Recommendation
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5920849.svg)](https://doi.org/10.5281/zenodo.5920849)
+
 Reproducibility study for the paper:
 
 *CosRec: 2D Convolutional Neural Networks for Sequential Recommendation, CIKM-2019*
