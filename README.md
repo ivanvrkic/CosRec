@@ -8,7 +8,7 @@ Reproducibility study for the paper:
 The code was tested with NVIDIA Tesla P100 with PyTorch 1.1.0 and Python 3.7.12.
 
 ## Custom Preprocessing
-Custom preprocessing is done by running the following:
+Custom preprocessing is done by running `preprocess.py`. Make sure to include raw datasets and adjust dataset path accordingly.
 ```
 python preprocess.py --dataset=ml1m
 python preprocess.py --dataset=gowalla
